@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<HTML>
+<head>
+    <style>
+        #man {
+            position: relative;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<BODY>
+<canvas id='man' width='45' height='70'>
+</canvas>
+<img src='home.png' width='60' height='80' align='left'>
+<img src='mgtu.png' style='position:relative;left:735px;right:100px' width='100' height='80'>
+<p id='demo'></p>
+<script>
+
+    text = document.getElementById("demo");
+    text.innerHTML += "Click on the man to walk"
+    setInterval(function () {
+        text.innerHTML += "Made By Melikhov Ivan."
+    }, 1000); //от себя добавил ( 500 - миллисекунда (1000мс=1сек))
+
+    canvas = document.getElementById("man");
+    telo = canvas.getContext("2d");
+    telo.arc(30, 10, 10, 0, Math.PI * 2, false);
+    telo.fill()
+    telo.fillStyle = '#FF0000';
+    telo.fillRect(27, 20, 5, 30);
+    telo.fillStyle = '#0000FF';
+    telo.fillRect(27, 43, 5, 4); //пояс
+    h=1;
+    for (var i = 1; i < 10; i++) {
+        telo.fillStyle = '#FF0000';
+        telo.fillRect(27+i, 20+h, 5, 5);
+        telo.fillStyle = '#0000FF';
+        telo.fillRect(27+i, 45+h, 5, 5);
+        h+=2;
+    }
+    h=1;
+    for (var i = 1; i < 10; i++) {
+        telo.fillStyle = '#FF0000';
+        telo.fillRect(27-i, 20+h, 5, 5);
+        telo.fillStyle = '#0000FF';
+        telo.fillRect(27-i, 45+h, 5, 5);
+        h+=2;
+    }
+
+    toMGTU = true;
+    //let timePassed;
+    to = 10;
+    man.onclick = function() {
+        let start = Date.now();
+
+        let timer = setInterval(function() {
+            if (toMGTU) {
+                timePassed = Date.now() - start;
+                //man.style.left = timePassed / 5 + 'px';
+                man.style.left = to + 'px';
+                to +=5;
+
+                if (timePassed > 3000) { //через 3 сек обратно
+                    toMGTU = false;
+                    start = Date.now();
+                    //last = timePassed / 5; //последняя точка
+                    back = to; //последняя точка
+                    //text.innerHTML += back; просто узнать координаты челика
+
+                }
+            }
+            else{
+                newtimePassed = Date.now() - start;
+
+                man.style.left = back + 'px';
+                back -=5;
+
+                if (newtimePassed > 3000) { //через 3 сек вперед
+                    toMGTU = true;
+                    start = Date.now();
+                    to = 10;
+                }
+            }
+        }, 20);
+    }
+</script>
+</BODY>
+</HTML>
