@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<HTML>
+<head>
+    <style>
+        #homework2 {
+            position: relative;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<BODY>
+<p id='demo'></p>
+<canvas id='homework2' width='100' height='100'/>
+
+<script>
+    /*
+ нужно анимировать треугольник
+(сделать движение для него, как и в 1 дз, но выводя его не через функцию fillRect(x, y, 1, 1),
+а через запись в буфер графической области.)
+То есть делать что-то вроде: data.data[index] = 255 для тех индексов, которые определяют позицию и цвет вашей фигуры
+А потом отображать ее через ctx.putImageData(data, 0, 0, ...)
+*/
+
+    text = document.getElementById("demo");
+    text.innerHTML += "Made By Melikhov Ivan."
+    setInterval(function () {
+        text.innerHTML += "Made By Melikhov Ivan."
+    }, 1500); //от себя добавил ( 1500 - миллисекунда (1000мс=1сек))
+
+    let canvas = document.getElementById('homework2');
+    let ctx = canvas.getContext('2d');
+    let ctx2 = canvas.getContext('2d');
+
+    var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    // большой треугольник
+    for (var j = 0; j < 100; j++) {
+        for (var i = 0; i < j; i++) {
+            data.data[100 * 4 * j + i * 4] = 255; //j-высота i- ширина
+            data.data[100 * 4 * j + i * 4 + 3] = 255;
+        }
+    }
+    // мини треугольник
+    for (var j = 0; j < 50; j++) {
+        for (var i = 0; i < j; i++) {
+            data.data[100 * 4 * (35+j) + (10+i) * 4] = 150;
+            data.data[100 * 4 * (35+j) + (10+i) * 4 + 3] = 255;
+        }
+    }
+    ctx.putImageData(data, 0, 0); //последние цифры - местоположение
+    console.log(data);
+
+    toRight = true;
+    to = 10;
+    let start = Date.now();
+
+    let timer = setInterval(function () {
+        var time = new Date();
+        if (toRight) {
+            timePassed = Date.now() - start;
+            homework2.style.left = to + 'px';
+            to += 5;
+            if (timePassed > 3000) { //через 3 сек обратно
+                toRight = false;
+                start = Date.now();
+                back = to; //последняя точка
+            }
+        } else {
+            newtimePassed = Date.now() - start;
+
+            homework2.style.left = back + 'px';
+            back -= 5;
+
+            if (newtimePassed > 3000) { //через 3 сек вперед
+                toRight = true;
+                start = Date.now();
+                to = 10;
+            }
+        }
+    }, 25);
+</script>
+</BODY>
+</HTML>
