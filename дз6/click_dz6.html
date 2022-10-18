@@ -1,0 +1,200 @@
+<HTML>
+<head>
+    <meta charset="UTF-8">
+    <p>Сначала левой кнопкой мыши выбираете 2 точки чтобы создать прямоугольник
+        Потом правой кнопкой мыши – отрезок</p>
+</head>
+<BODY>
+<canvas id='homework6' width='1000' height='700' style="background: #F8FFAE"/>
+
+<script>
+    let canvas = document.getElementById("homework6");
+    let ctx = canvas.getContext("2d");
+
+    function draw_line(x0, y0, x_end, y_end, color, rect_X_start, rect_Y_start, rect_X_end, rect_Y_end) {
+        ctx.fillStyle = color;
+        var dx = x_end - x0;
+        var dy = y_end - y0;
+
+        var sign_x = Math.sign(dx);
+        var sign_y = Math.sign(dy);
+
+        var x = x0;
+        var y = y0;
+        var e = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+        while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+            e += 2 * dy;
+            if (Math.abs(e) >= Math.abs(dx)) {
+                y += sign_y;
+                e -= 2 * sign_x * sign_y * dx;
+            }
+
+            if (for_p(x, y, rect_X_start, rect_Y_start, rect_X_end, rect_Y_end) == center__){ // попадает в поле
+                ctx.fillRect(x, y, 1, 1);
+            }
+            //ctx.fillRect(x, y, 1, 1);
+            x += sign_x;
+        }
+        } else {
+            while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                e += 2 * dx;
+                if (Math.abs(e) >= Math.abs(dy)) {
+                    x += sign_x;
+                    e -= 2 * sign_x * sign_y * dy;
+                }
+                if (for_p(x, y, rect_X_start, rect_Y_start, rect_X_end, rect_Y_end) == center__){ // попадает в поле
+                    ctx.fillRect(x, y, 1, 1);
+                }
+                y += sign_y;
+            }
+        }
+    }
+
+    function draw_Rectangle_by_brezenh(x_start, y0, x_end, y_end, color) {
+        ctx.fillStyle = color;
+        x_0 = x_start
+        while (x_0 !== x_end) { //идём от начала точки до конца точки (по X)
+            ctx.fillRect(x_0, y0, 2, 2);
+            ctx.fillRect(x_0, y_end, 2, 2);
+            x_0 += 1;
+        }
+        x_0 = x_start
+        while (y0 !== y_end) { //идём от начала точки до конца точки (по Y)
+            ctx.fillRect(x_0, y0, 2, 2);
+            ctx.fillRect(x_end, y0, 2, 2);
+            y0 += 1;
+        }
+    }
+
+    //коорд прямоуг
+    var rec_x_1;
+    var rec_y_1;
+
+    var rec_x_2;
+    var rec_y_2;
+
+    var state = 0
+    var fake;
+    ////////////////////////////////////////////////////////////////////////////////////
+    //////////// обрабтка нажатия левой          прямоугольник
+    ////////////////////////////////////////////////////////////////////////////////////
+    canvas.addEventListener("contextmenu", function (context) {   // обрабтка нажатия
+        if (state === 0) {
+            rec_x_1 = context.offsetX;
+            rec_y_1 = context.offsetY;
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(rec_x_1, rec_y_1, 2, 2);
+            state = 1;
+        } else if (state === 1) {
+            rec_x_2 = context.offsetX;
+            rec_y_2 = context.offsetY;
+            // бесполезно - не увидишь
+            // ctx.fillStyle = '#0000FF';
+            // ctx.fillRect(rec_x_2, rec_y_2, 2, 2);
+            state = 99;
+        }
+
+        if (state === 99) {
+            //меняем / чтоб было от меньшего к большему
+            //для прямоугольника - от верхнего левого к нижнему право
+            if (rec_x_1 > rec_x_2) {// || y0 > y_end) {
+                fake = rec_x_1;
+                rec_x_1 = rec_x_2;
+                rec_x_2 = fake;
+                //console.log("swap XXX")
+            }
+            if (rec_y_1 > rec_y_2) {
+                fake = rec_y_1;
+                rec_y_1 = rec_y_2;
+                rec_y_2 = fake;
+                //console.log("swap YYY")
+            }
+
+            draw_Rectangle_by_brezenh(rec_x_1, rec_y_1, rec_x_2, rec_y_2, '#AA0000')
+        }
+    })
+    ///////////////////////////конец обработки левой/////////////////////////////////////////////////////////
+
+    // знаю что тут лишнее но пусть
+    let left_up = [1, 0, 1, 0];
+    let left__ = [0, 0, 1, 0];
+    let left_down = [0, 1, 1, 0];
+
+    let center_up = [1, 0, 0, 0];
+    let center__ = [0, 0, 0, 0];
+    let center_down = [0, 1, 0, 0];
+
+    let right_up = [1, 0, 0, 1];
+    let right__ = [0, 0, 0, 1];
+    let right_down = [0, 1, 0, 1];
+
+    function for_p(_x, _y, rect_X_start, rect_Y_start, rect_X_end, rect_Y_end) {
+        if (_x < rect_X_start) {
+            if (_y < rect_Y_start) {
+                p = left_up;
+            } else if (_y > rect_Y_end) {
+                p = left_down;
+            } else {
+                p = left__;
+            }
+        } else if (_x > rect_X_end) {
+            if (_y < rect_Y_start) {
+                p = right_up;
+            } else if (_y > rect_Y_end) {
+                p = right_down;
+            } else {
+                p = right__;
+            }
+        } else { // (_x == rect_X_start)
+            if (_y < rect_Y_start) {
+                p = center_up;
+            } else if (_y > rect_Y_end) {
+                p = center_down;
+            } else {
+                p = center__;
+            }
+        }
+        return p
+    }
+
+    //начало коорд
+    var x0;
+    var y0;
+    //конец коорд
+    var x_end;
+    var y_end;
+
+    var click = 0
+    ////////////////////////////////////////////////////////////////////////////////////
+    //////////// обрабтка нажатия правой            отрезок
+    ////////////////////////////////////////////////////////////////////////////////////
+    canvas.addEventListener("click", function (event) {
+        if (click === 0) {
+            x0 = event.offsetX;
+            y0 = event.offsetY;
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(x0, y0, 2, 2);
+            click = 1;
+        } else if (click === 1) {
+            x_end = event.offsetX;
+            y_end = event.offsetY;
+            ctx.fillStyle = '#0033ff';
+            ctx.fillRect(x_end, y_end, 2, 2);
+            click = 99;
+        }
+
+        if (click === 99) {
+            //алг брезенхем
+            draw_line (x0, y0, x_end, y_end, '#000000', rec_x_1, rec_y_1, rec_x_2, rec_y_2)
+
+            click = 0;
+        }
+    })
+    /////////////////конец обработки правой///////////////////////////////////////////////////////////////////
+
+
+</script>
+</BODY>
+</HTML>
