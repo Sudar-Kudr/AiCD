@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <p> Клик чтобы поставить точки.
+        <br>правой кнопкой мыши – нарисовать, а если еще раз то очищает</p>
+</head>
+<body>
+<canvas id='canvas' width='1000' height='700' style='border:2px solid black'/>
+<script>
+    let canvas = document.getElementById("canvas");
+    let context = canvas.getContext("2d");
+
+    class Point {
+        constructor(x, y) {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+    function DrawLine(startPoint, midPoint, endPoint) {
+
+        var N = len(endPoint.X - midPoint.X, endPoint.Y - midPoint.Y);
+        var midDistance = new Point(midPoint.X - startPoint.X, midPoint.Y - startPoint.Y);
+        var endDistance = new Point(endPoint.X - startPoint.X, endPoint.Y - startPoint.Y);
+        var k = (midDistance.X * endDistance.Y - midDistance.Y * endDistance.X) / (Math.pow(endDistance.X, 2) - Math.pow(endDistance.Y, 2));
+        var check = Math.abs(k * N)
+
+        if (check < 1) {
+            x0 = Math.floor(startPoint.X);
+            y0 = Math.floor(startPoint.Y);
+            x_end = Math.floor(endPoint.X);
+            y_end = Math.floor(endPoint.Y);
+
+            var dx = x_end - x0;
+            var dy = y_end - y0;
+
+            var sign_x = Math.sign(dx);
+            var sign_y = Math.sign(dy);
+
+            var x = x0;
+            var y = y0;
+            var e = 0;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+                    e += 2 * dy;
+                    if (Math.abs(e) >= Math.abs(dx)) {
+                        y += sign_y;
+                        e -= 2 * sign_x * sign_y * dx;
+                    }
+                    context.fillRect(x, y, 2, 2);
+                    x += sign_x;
+                }
+            } else {
+                while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                    e += 2 * dx;
+                    if (Math.abs(e) >= Math.abs(dy)) {
+                        x += sign_x;
+                        e -= 2 * sign_x * sign_y * dy;
+                    }
+                    context.fillRect(x, y, 2, 2);
+                    y += sign_y;
+                }
+            }
+            return
+        }
+
+        var mid1 = new Point((startPoint.X + midPoint.X) * 0.5, (startPoint.Y + midPoint.Y) * 0.5);
+        var mid2 = new Point((endPoint.X + midPoint.X) * 0.5, (endPoint.Y + midPoint.Y) * 0.5);
+        var p = new Point((mid1.X + mid2.X) * 0.5, (mid1.Y + mid2.Y) * 0.5);
+
+        DrawLine(startPoint, mid1, p)
+        DrawLine(p, mid2, endPoint)
+    }
+
+    function DrawInterpolation(points) {
+        let midPoints = [];
+
+        let b = [0];
+        for (let i = 1; i < points.length; i++) {
+            b.push(2 * (points[i - 1].Y - points[i].Y) / (points[i - 1].X - points[i].X) - b[i - 1]);
+        }
+        coef = b;
+
+        for (let i = 1; i < points.length; i++) {
+            let d0 = points[i - 1].Y - coef[i - 1] * points[i - 1].X;
+            let d1 = points[i].Y - coef[i] * points[i].X;
+
+            let xM = (d0 - d1) / (coef[i] - coef[i - 1]);
+            let yM = d0 + coef[i - 1] * xM;
+
+            midPoints.push(new Point(xM, yM));
+        }
+
+        for (let i = 0; i < midPoints.length; ++i) {
+            DrawLine(points[i], midPoints[i], points[i + 1]);
+        }
+    }
+
+    function len(pX, pY) {
+        return Math.sqrt(pX ** 2 + pY ** 2);
+    }
+
+    let points = []
+    let state = false;
+
+    canvas.addEventListener("click", function (event) {
+        if (!state) {
+            // let newPoint = {
+            //     X: event.offsetX,
+            //     Y: event.offsetY
+            // }
+            let newPoint = new Point(event.offsetX, event.offsetY);
+            context.fillRect(newPoint.X, newPoint.Y, 2, 2);
+            points.push(newPoint);
+        }
+    });
+
+    canvas.addEventListener('contextmenu', function () {
+        if (!state) {
+            DrawInterpolation(points);
+            points = [];
+        } else {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        state = !state;
+    });
+</script>
+</body>
+</html>
