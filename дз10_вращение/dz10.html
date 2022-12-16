@@ -1,0 +1,643 @@
+<HTML>
+<head>
+    <meta charset="UTF-8">
+    <title>Bezie Rotation</title>
+</head>
+<BODY>
+<h3>тут рисуйте три точки </h3>
+<canvas id='canvas1' width='500' height='250' style='border:2px solid black'></canvas>
+<h3>X <span style='padding-left:500px;'> </span> X+Y<span style='padding-left:500px;'> </span> 3D</h3>
+<canvas id='canvasx' width='500' height='250' style='border:2px solid black'></canvas>
+<canvas id='canvasxYYY' width='500' height='250' style='border:2px solid black'></canvas>
+<canvas id='canvasxYYY_3D' width='500' height='250' style='border:2px solid black'></canvas>
+<h3>Y</h3>
+<canvas id='canvas2' width='500' height='250' style='border:2px solid black'></canvas>
+<h3>Z</h3>
+<canvas id='canvas3' width='1000' height='500' style='border:2px solid black'></canvas>
+<script src="dz10_2D_3D.js"></script>
+<script>
+	let canvas = document.getElementById("canvas1");
+	let ctx = canvas.getContext("2d");
+
+    let canvasx = document.getElementById("canvasx");
+    let ctx4 = canvasx.getContext("2d");
+
+    let canvasx_y = document.getElementById("canvasxYYY");
+    let ctx44 = canvasx_y.getContext("2d");
+
+    let canvasx_y_3D = document.getElementById("canvasxYYY_3D");
+    let ctx444 = canvasx_y_3D.getContext("2d");
+
+
+    let canvas2 = document.getElementById("canvas2");
+    let ctx2 = canvas2.getContext("2d");
+
+    let canvas3 = document.getElementById("canvas3");
+    let ctx3 = canvas3.getContext("2d");
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //////////////////////////рисуем кривую безье//////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    function draw_line_by_brezenhem(x0, y0, x_end, y_end, color) {
+        ctx.fillStyle = color;
+        var dx = x_end - x0;
+        var dy = y_end - y0;
+
+        var sign_x = Math.sign(dx);
+        var sign_y = Math.sign(dy);
+
+        var x = x0;
+        var y = y0;
+        var e = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+                e += 2 * dy;
+                if (Math.abs(e) >= Math.abs(dx)) {
+                    y += sign_y;
+                    e -= 2 * sign_x * sign_y * dx;
+                }
+                ctx.fillRect(x, y, 2, 2);
+                x += sign_x;
+            }
+        } else {
+            while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                e += 2 * dx;
+                if (Math.abs(e) >= Math.abs(dy)) {
+                    x += sign_x;
+                    e -= 2 * sign_x * sign_y * dy;
+                }
+                ctx.fillRect(x, y, 2, 2);
+                y += sign_y;
+            }
+        }
+    }
+
+    function get_distance(P0, P1, P2) {
+        let N = Math.sqrt(Math.pow((P1.x - P2.x), 2) + Math.pow((P1.y - P2.y), 2))
+        let k = ((P0.x - P1.x) * (P0.y - P2.y) - (P0.y - P1.y) * (P0.x - P2.x)) / (Math.pow((P0.x - P2.x), 2) - Math.pow((P0.y - P2.y), 2))
+        return Math.abs(k * N)
+    }
+
+    function draw(P0, P1, P2) {
+
+        if (get_distance(P0, P1, P2) < 1) {
+            //console.log("kbjbjbjbbujgbj", P0.x, P0.y, P2.x, P2.y)
+            // console.log(P0)
+            // console.log(P1)
+            // console.log(P2)
+            //console.log(Math.floor(P0.x), " = ", Math.floor(P0.y), " = ", P2.x, " = ", P2.y) //переводим в цел. число
+            draw_line_by_brezenhem(Math.floor(P0.x), Math.floor(P0.y), Math.floor(P2.x), Math.floor(P2.y), '#F0A000')
+            //draw_line(P0, P2)
+            //draw_line(250, 250, 100, 150, '#000000')
+            return
+        }
+        let P0_1 = {
+            x: 0,
+            y: 0
+        }
+
+        let P1_1 = {
+            x: 0,
+            y: 0
+        }
+
+        let P0_2 = {
+            x: 0,
+            y: 0
+        }
+
+        P0_1.x = (P0.x + P1.x) * 0.5
+        P0_1.y = (P0.y + P1.y) * 0.5
+        P1_1.x = (P2.x + P1.x) * 0.5
+        P1_1.y = (P2.y + P1.y) * 0.5
+        P0_2.x = (P0_1.x + P1_1.x) * 0.5
+        P0_2.y = (P0_1.y + P1_1.y) * 0.5
+
+        draw(P0, P0_1, P0_2)
+        draw(P0_2, P1_1, P2)
+    }
+
+    ////////// по X //////
+    function draw_line_by_brezenhem_Ox(x0, y0, x_end, y_end, color) {
+        ctx4.fillStyle = color;
+        var dx = x_end - x0;
+        var dy = y_end - y0;
+
+        var sign_x = Math.sign(dx);
+        var sign_y = Math.sign(dy);
+
+        var x = x0;
+        var y = y0;
+        var e = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+                e += 2 * dy;
+                if (Math.abs(e) >= Math.abs(dx)) {
+                    y += sign_y;
+                    e -= 2 * sign_x * sign_y * dx;
+                }
+                ctx4.fillRect(x, y, 2, 2);
+                x += sign_x;
+            }
+        } else {
+            while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                e += 2 * dx;
+                if (Math.abs(e) >= Math.abs(dy)) {
+                    x += sign_x;
+                    e -= 2 * sign_x * sign_y * dy;
+                }
+                ctx4.fillRect(x, y, 2, 2);
+                y += sign_y;
+            }
+        }
+    }
+
+    function draw_x(P0, P1, P2, color) {
+        // console.log(get_distance(P0, P1, P2), "<", 1)
+        //
+        //mid = get_middle(get_distance(P0, P1, P2))
+        // console.log(mid)
+
+        if (get_distance(P0, P1, P2) < 1) {
+            // console.log("here", P0.x, P0.y, P2.x, P2.y)
+            // console.log(P0)
+            // console.log(P1)
+            // console.log(P2)
+            //console.log(Math.floor(P0.x), " = ", Math.floor(P0.y), " = ", P2.x, " = ", P2.y) //переводим в цел. число
+            draw_line_by_brezenhem_Ox(Math.floor(P0.x), Math.floor(P0.y), Math.floor(P2.x), Math.floor(P2.y), color)
+            //draw_line_by_brezenhem_Oy(Math.floor(P0.x+mid), Math.floor(P0.y+mid), Math.floor(P2.x+mid), Math.floor(P2.y+mid), '#f00000')
+            //draw_line(P0, P2)
+            //draw_line(250, 250, 100, 150, '#000000')
+            return
+        }
+        let P0_11 = {
+            x: 0,
+            y: 0
+        }
+
+        let P11_1 = {
+            x: 0,
+            y: 0
+        }
+
+        let P00_2 = {
+            x: 0,
+            y: 0
+        }
+
+        P0_11.x = (P0.x + P1.x) * 0.5
+        P0_11.y = (P0.y + P1.y) * 0.5
+        P11_1.x = (P2.x + P1.x) * 0.5
+        P11_1.y = (P2.y + P1.y) * 0.5
+        P00_2.x = (P0_11.x + P11_1.x) * 0.5
+        P00_2.y = (P0_11.y + P11_1.y) * 0.5
+
+        draw_x(P0, P0_11, P00_2, color)
+        draw_x(P00_2, P11_1, P2, color)
+    }
+
+    ////////// по Y //////
+    function draw_line_by_brezenhem_Oy(x0, y0, x_end, y_end, color) {
+        ctx2.fillStyle = color;
+        var dx = x_end - x0;
+        var dy = y_end - y0;
+
+        var sign_x = Math.sign(dx);
+        var sign_y = Math.sign(dy);
+
+        var x = x0;
+        var y = y0;
+        var e = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+                e += 2 * dy;
+                if (Math.abs(e) >= Math.abs(dx)) {
+                    y += sign_y;
+                    e -= 2 * sign_x * sign_y * dx;
+                }
+                ctx2.fillRect(x, y, 2, 2);
+                x += sign_x;
+            }
+        } else {
+            while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                e += 2 * dx;
+                if (Math.abs(e) >= Math.abs(dy)) {
+                    x += sign_x;
+                    e -= 2 * sign_x * sign_y * dy;
+                }
+                ctx2.fillRect(x, y, 2, 2);
+                y += sign_y;
+            }
+        }
+    }
+
+    function draw_y(P0, P1, P2) {
+        // console.log(get_distance(P0, P1, P2), "<", 1)
+        //
+        //mid = get_middle(get_distance(P0, P1, P2))
+        // console.log(mid)
+
+
+        if (get_distance(P0, P1, P2) < 1) {
+            // console.log("here", P0.x, P0.y, P2.x, P2.y)
+            // console.log(P0)
+            // console.log(P1)
+            // console.log(P2)
+            //console.log(Math.floor(P0.x), " = ", Math.floor(P0.y), " = ", P2.x, " = ", P2.y) //переводим в цел. число
+            draw_line_by_brezenhem_Oy(Math.floor(P0.x), Math.floor(P0.y), Math.floor(P2.x), Math.floor(P2.y), '#f00000')
+            //draw_line_by_brezenhem_Oy(Math.floor(P0.x+mid), Math.floor(P0.y+mid), Math.floor(P2.x+mid), Math.floor(P2.y+mid), '#f00000')
+            //draw_line(P0, P2)
+            //draw_line(250, 250, 100, 150, '#000000')
+            return
+        }
+        let P0_11 = {
+            x: 0,
+            y: 0
+        }
+
+        let P11_1 = {
+            x: 0,
+            y: 0
+        }
+
+        let P00_2 = {
+            x: 0,
+            y: 0
+        }
+
+        P0_11.x = (P0.x + P1.x) * 0.5
+        P0_11.y = (P0.y + P1.y) * 0.5
+        P11_1.x = (P2.x + P1.x) * 0.5
+        P11_1.y = (P2.y + P1.y) * 0.5
+        P00_2.x = (P0_11.x + P11_1.x) * 0.5
+        P00_2.y = (P0_11.y + P11_1.y) * 0.5
+
+        draw_y(P0, P0_11, P00_2)
+        draw_y(P00_2, P11_1, P2)
+    }
+ ///////////// по Z //////////
+    function draw_line_by_brezenhem_Oz(x0, y0, x_end, y_end, color) {
+        ctx3.fillStyle = color;
+        var dx = x_end - x0;
+        var dy = y_end - y0;
+
+        var sign_x = Math.sign(dx);
+        var sign_y = Math.sign(dy);
+
+        var x = x0;
+        var y = y0;
+        var e = 0;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            while (x !== x_end) { //идём от начала точки до конца точки (по Х)
+                e += 2 * dy;
+                if (Math.abs(e) >= Math.abs(dx)) {
+                    y += sign_y;
+                    e -= 2 * sign_x * sign_y * dx;
+                }
+                ctx3.fillRect(x, y, 2, 2);
+                x += sign_x;
+            }
+        } else {
+            while (y !== y_end) { //идём от начала точки до конца точки (по Y)
+                e += 2 * dx;
+                if (Math.abs(e) >= Math.abs(dy)) {
+                    x += sign_x;
+                    e -= 2 * sign_x * sign_y * dy;
+                }
+                ctx3.fillRect(x, y, 2, 2);
+                y += sign_y;
+            }
+        }
+    }
+
+    function draw_z(P0, P1, P2) {
+        // console.log(get_distance(P0, P1, P2), "<", 1)
+        //
+        //mid = get_middle(get_distance(P0, P1, P2))
+        // console.log(mid)
+
+
+        if (get_distance(P0, P1, P2) < 1) {
+            // console.log("here", P0.x, P0.y, P2.x, P2.y)
+            draw_line_by_brezenhem_Oz(Math.floor(P0.x), Math.floor(P0.y), Math.floor(P2.x), Math.floor(P2.y), '#004cf0')
+            return
+        }
+        let P0_11 = {
+            x: 0,
+            y: 0
+        }
+
+        let P11_1 = {
+            x: 0,
+            y: 0
+        }
+
+        let P00_2 = {
+            x: 0,
+            y: 0
+        }
+
+        P0_11.x = (P0.x + P1.x) * 0.5
+        P0_11.y = (P0.y + P1.y) * 0.5
+        P11_1.x = (P2.x + P1.x) * 0.5
+        P11_1.y = (P2.y + P1.y) * 0.5
+        P00_2.x = (P0_11.x + P11_1.x) * 0.5
+        P00_2.y = (P0_11.y + P11_1.y) * 0.5
+
+        draw_z(P0, P0_11, P00_2)
+        draw_z(P00_2, P11_1, P2)
+    }
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
+    i=10
+    var alpha = i * Math.PI / 180;
+
+    var O_x = [1, 0, 0, 0,
+        0, Math.cos(alpha), -1 * Math.sin(alpha), 0,
+        0, Math.sin(alpha), Math.cos(alpha), 0,
+        0, 0, 0, 1];
+
+    var O_y = [Math.sin(alpha), 0, Math.cos(alpha), 0,
+        0, 1, 0, 0,
+        Math.cos(alpha), 0, -1 * Math.sin(alpha), 0,
+        0, 0, 0, 1];
+
+    var O_z = [Math.cos(alpha), -1 * Math.sin(alpha), 0, 0,
+        Math.sin(alpha), Math.cos(alpha), 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 1];
+
+    // function Move(){
+    //
+    // }
+
+
+    function Rotate_x(x, y, z, howMuch) {
+        // howMuch = howMuch * Math.PI / 180;
+        p1= x;
+        p2= Math.sin(howMuch) * y - Math.cos(howMuch)*z;
+        p3= Math.cos(howMuch) * y + Math.sin(howMuch)*z;
+        p4= 1;
+        var P = {
+            x: p1,
+            y: p2,
+            z: p3
+        }
+        return P
+    }
+
+    function Rotate_y(x, y, z, howMuch) {
+        //howMuch = howMuch * Math.PI / 180;
+        let p1= Math.sin(howMuch) * x - Math.cos(howMuch)*z;
+        let p2= y;
+        let p3= Math.cos(howMuch) * x + Math.sin(howMuch)*z;
+        let p4= 1;
+
+        var P = {
+            x: p1,
+            y: p2,
+            z: p3
+        }
+        return P
+    }
+
+    function Move(dX = 0, dY = 0, dZ = 0) {
+        let matrix = [
+            [1, 0, 0, dX],
+            [0, 1, 0, dY],
+            [0, 0, 1, dZ],
+            [0, 0, 0, 1]
+        ];
+        this.seq.push(matrix);
+        return this;
+    }
+
+    function MultiplyMatrix(A, B) {
+        let n = A.length;
+        let m = A[0].length;
+        let p = B[0].length;
+
+        if (m !== B.length) {
+            throw new Error();
+        }
+
+        let result = Array(n).fill().map(() => Array(p).fill(0))
+
+        for (let i = 0; i < n; ++i) {
+            for (let j = 0; j < p; ++j) {
+                for (let k = 0; k < m; ++k) {
+                    result[i][j] += A[i][k] * B[k][j];
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function for_rotate_z(P0, howMuch) {
+        let matrixMOVE = [
+            [1, 0, 0, -P0.x],
+            [0, 1, 0, -P0.y],
+            [0, 0, 1, -P0.z],
+            [0, 0, 0, 1]
+        ];
+
+        let matrix_rotate_Z = [
+            [Math.sin(howMuch), -Math.cos(howMuch), 0, 0],
+            [Math.cos(howMuch), Math.sin(howMuch), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ];
+        let matrixMOVE_back = [
+            [1, 0, 0, P0.x],
+            [0, 1, 0, P0.y],
+            [0, 0, 1, P0.z],
+            [0, 0, 0, 1]
+        ];
+        res = MultiplyMatrix(matrixMOVE, matrix_rotate_Z)
+        res2 = MultiplyMatrix(res, matrixMOVE_back)
+        final = MultiplyMatrix(res2, [[P0.x], [P0.y], [P0.z], [1]])
+
+        //fake = [[P0.x], [P0.y], [P0.z], [1]]
+        var P = {
+            x: final[0][0],
+            y: final[1][0],
+            z: final[2][0]
+        }
+
+        return P
+    }
+
+	function Rotate_z(x, y, z, howMuch) {
+		// howMuch = howMuch * Math.PI / 180;
+		p1= Math.sin(howMuch) * x - Math.cos(howMuch)*y;
+		p2= Math.cos(howMuch) * x + Math.sin(howMuch)*y;
+		p3= z;
+		p4= 1;
+
+        var P = {
+            x: p1,
+            y: p2,
+            z: p3
+        }
+        return P
+	}
+
+	// x= 100
+	// y= 0
+	// z= 0
+	// Rotate_z(x, y, z, 10);
+
+
+
+
+    let state = 0;
+    canvas.addEventListener("click", function (event) {
+        ctx.fillStyle = 'black';
+        if (state === 0) {
+            P0 = {
+                x: event.offsetX,
+                y: event.offsetY,
+                z: 0
+            }
+            ctx.fillRect(P0.x, P0.y, 2, 2);
+            state = 1;
+        } else if (state === 1) {
+            P1 = {
+                x: event.offsetX,
+                y: event.offsetY,
+                z: 0
+            }
+            ctx.fillRect(P1.x, P1.y, 2, 2);
+            state = 2;
+        } else if (state === 2) {
+            P2 = {
+                x: event.offsetX,
+                y: event.offsetY,
+                z: 0
+            }
+            draw(P0, P1, P2)  //рисуем на оси X Y
+            //рисуем на оси Z Y
+
+            var k=0
+            var mid = (P2.x-P0.x)/2
+            var mid_y = Math.abs(P2.y-P0.y)/2
+            for (var i = 0; i < 360; i += 10) { // чтоб был 3D - надо добавить 360
+                var alpha = i * Math.PI / 180;
+                //var alpha = 165 * Math.PI / 180
+                //alpha = 90 * Math.PI / 180;
+                //alpha = 45 * Math.PI / 180;
+                var newP0_x = Rotate_x(P0.x, P0.y, P0.z, alpha)
+                var newP1_x = Rotate_x(P1.x, P1.y, P1.z, alpha)
+                var newP2_x = Rotate_x(P2.x, P2.y, P2.z, alpha)
+
+                //чтоб было видно все линии
+                newP0_x.y = newP0_x.y + P0.y + mid_y
+                newP1_x.y = newP1_x.y + P0.y + mid_y
+                newP2_x.y = newP2_x.y + P0.y + mid_y
+
+                var newP0_x_andY = Rotate_y(newP0_x.x, newP0_x.y, newP0_x.z, 45 * Math.PI / 180)
+                var newP1_x_andY = Rotate_y(newP1_x.x, newP1_x.y, newP1_x.z, 45 * Math.PI / 180)
+                var newP2_x_andY = Rotate_y(newP2_x.x, newP2_x.y, newP2_x.z, 45 * Math.PI / 180)
+
+                if (i === 160) {
+                    //красный
+                    draw_x(newP0_x, newP1_x, newP2_x, '#f00000')
+                    draw_x_and_Y(newP0_x_andY, newP1_x_andY, newP2_x_andY, '#f00000')
+                    draw_x_and_Y_3D(newP0_x_andY, newP1_x_andY, newP2_x_andY, '#f00000')
+                    // иначе зеленый
+                }else {
+                    draw_x(newP0_x, newP1_x, newP2_x, '#34f000')
+                    draw_x_and_Y_3D(newP0_x_andY, newP1_x_andY, newP2_x_andY, '#34f000')
+                }
+
+
+                var newP0 = Rotate_y(P0.x, P0.y, P0.z, alpha)
+                var newP1 = Rotate_y(P1.x, P1.y, P1.z, alpha)
+                var newP2 = Rotate_y(P2.x, P2.y, P2.z, alpha)
+
+
+                //попытался сделать через МRМ, вышло что без разницы, но оставил
+                /*
+                var newP0_z = for_rotate_z(P0, alpha)
+                var newP1_z = for_rotate_z(P1, alpha)
+                var newP2_z = for_rotate_z(P2, alpha)
+*/
+                // console.log(P0.x, P0.y, P0.z, alpha)
+                // console.log("P0.x, P0.y, P0.z, alpha")
+                // console.log(newP0_z.x, newP0_z.y, newP0_z.z, alpha)
+
+                var newP0_z = Rotate_z(P0.x, P0.y, P0.z, alpha)
+                var newP1_z = Rotate_z(P1.x, P1.y, P1.z, alpha)
+                var newP2_z = Rotate_z(P2.x, P2.y, P2.z, alpha)
+
+                newP0_z.x = newP0_z.x + 300
+                newP1_z.x = newP1_z.x + 300
+                newP2_z.x = newP2_z.x + 300
+
+                newP0_z.y = newP0_z.y + 300
+                newP1_z.y = newP1_z.y + 300
+                newP2_z.y = newP2_z.y + 300
+                //синий
+                draw_z(newP0_z, newP1_z, newP2_z)
+
+
+                //чтоб была ближе к центру
+                if (i === 0){ // || i === 180){
+                    //ok
+                    newP0.x = newP0.x+mid+P0.x
+                    newP1.x = newP1.x+mid+P0.x
+                    newP2.x = newP2.x+mid+P0.x
+                    // k=0
+
+                    draw_y(newP0, newP1, newP2)
+                    //draw_z(P0, P1, P2)
+                    //draw_z(newP0_z, newP1_z, newP2_z)
+                } else if(i > 180){
+                    //k+=0.5
+                    k=2 //тут должен быть грамотный коэффициент но я не знаю какой и не хочу ломать голову...
+                    newP0.x = newP0.x+mid*k+P0.x
+                    newP1.x = newP1.x+mid*k+P0.x
+                    newP2.x = newP2.x+mid*k+P0.x
+                    draw_y(newP0, newP1, newP2)
+
+                    //console.log("here2", P0.x, newP0_z.x, " = ", P0.x - newP0_z.x)
+
+                    // newP0_z.x = P0.x - newP0_z.x
+                    // newP1_z.x = P0.x - newP1_z.x
+                    // newP2_z.x = P0.x - newP2_z.x
+                    //
+                    // newP0_z.y = P0.y - newP0_z.y
+                    // newP1_z.y = P0.y - newP1_z.y
+                    // newP2_z.y = P0.y - newP2_z.y
+                    //
+                    // draw_z(newP0_z, newP1_z, newP2_z)
+                } else{
+                    newP0.x = newP0.x+mid
+                    newP1.x = newP1.x+mid
+                    newP2.x = newP2.x+mid
+                    draw_y(newP0, newP1, newP2)
+                    // draw_z(newP0_z, newP1_z, newP2_z)
+                }
+
+
+            }
+
+            //draw(P2, P0, P1) // для проверки цикла
+
+            state = 10;
+        }
+
+    });
+
+</script>
+</BODY>
+</HTML>
